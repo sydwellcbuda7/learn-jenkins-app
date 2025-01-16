@@ -6,8 +6,7 @@ pipeline {
             agent {
                 docker {
                     image 'node:18-alpine'
-                    reuseNode = true
-
+                    args '--mount=type=bind,source=${WORKSPACE},target=/workspace'
                 }
             }
             steps {

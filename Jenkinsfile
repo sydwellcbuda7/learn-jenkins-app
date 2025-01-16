@@ -45,8 +45,6 @@ pipeline {
             }
             steps {
                 sh '''
-                     nvm install 18.20.4
-                     nvm use 18
                      npm install serve
                      node_modules/.bin/serve -s build $
                      sleep 10

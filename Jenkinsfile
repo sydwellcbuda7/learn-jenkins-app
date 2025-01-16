@@ -45,6 +45,7 @@ pipeline {
             }
             steps {
                 sh '''
+                     nvm install 18
                      nvm use 18
                      npm install serve
                      node_modules/.bin/serve -s build $

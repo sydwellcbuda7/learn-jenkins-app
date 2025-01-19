@@ -74,29 +74,7 @@ pipeline {
             }
         }
 
-        stage('Deploy Stagging') {
-            agent {
-                docker {
-                    image 'node:18-alpine'
-                    reuseNode true
-                }
-            }
-            steps {
-                sh '''
-                    echo "Deploting to stagging. Site ID: $NETLIFY_SITE_ID"
-                    echo "Netlify Token: $NETLIFY_AUTH_TOKEN"
-                    npm install netlify-cli node-jq
-                    node_modules/.bin/netlify --version
-                    node_modules/.bin/netlify status
-                    node_modules/.bin/netlify deploy --dir=build --json > deploy-output.json
-                '''
-                script {
-                        env.STAGGING_URL =  sh(script: " node_modules/.bin/node-jq -r  '.deploy_url'  deploy-output.json ",  returnStdout: true)
-                }
-            }
-        }
-
-         stage('Stagging E2E') {
+         stage('Deploy Stagging and E2E') {
             agent {
                 docker {
                     image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
@@ -104,10 +82,16 @@ pipeline {
                 }
             }
             environment{
-                    CI_ENVIRONMENT_URL = "${env.STAGGING_URL}"
+                    CI_ENVIRONMENT_URL = 'STAGGING_URL_TO_BE_SET'
             }
              steps {
                 sh '''
+                    node --version
+                    npm install netlify-cli node-jq
+                    node_modules/.bin/netlify --version
+                    node_modules/.bin/netlify status
+                    node_modules/.bin/netlify deploy --dir=build --json > stagging-deploy-output.json
+                    CI_ENVIRONMENT_URL = $(node_modules/.bin/node-jq -r '.deploy_url'  stagging-deploy-output.json)
                     npx playwright test  --reporter=html
                 '''
              }
@@ -127,36 +111,25 @@ pipeline {
             }
         }
 
-        stage('Deploy Prod') {
-            agent {
-                docker {
-                    image 'node:18-alpine'
-                    reuseNode true
-                }
-            }
-            steps {
-                sh '''
-                    echo "Deploting to production. Site ID: $NETLIFY_SITE_ID"
-                    echo "Netlify Token: $NETLIFY_AUTH_TOKEN"
-                    npm install netlify-cli
-                    node_modules/.bin/netlify --version
-                    node_modules/.bin/netlify status
-                    node_modules/.bin/netlify deploy --dir=build --prod
-                '''
-            }
-        }
-         stage('Prod E2E') {
+
+         stage('Prod Deploy and E2E') {
             agent {
                 docker {
                     image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
                     reuseNode true
                 }
             }
-        environment{
-            CI_ENVIRONMENT_URL = 'https://learn-je.netlify.app'
-        }
+            environment{
+                CI_ENVIRONMENT_URL = 'PROD_URL_TO_BE_SET'
+            }
              steps {
                 sh '''
+                    node --version
+                    npm install netlify-cli
+                    node_modules/.bin/netlify --version
+                    node_modules/.bin/netlify status
+                    node_modules/.bin/netlify deploy --dir=build --prod --json > prod-deploy-output.json
+                    CI_ENVIRONMENT_URL = $(node_modules/.bin/node-jq -r '.deploy_url'  prod-deploy-output.json)
                     npx playwright test  --reporter=html
                 '''
              }

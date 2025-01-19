@@ -8,6 +8,12 @@ pipeline {
     }
     stages {
 
+        stage('Docker Build Image') {
+
+            sh '''
+            docker build -t my-playwright .
+            '''
+        }
         stage('Build') {
             agent {
                 docker {
@@ -15,6 +21,7 @@ pipeline {
                     reuseNode true
                 }
             }
+
             steps {
                 sh '''
                     ls -la

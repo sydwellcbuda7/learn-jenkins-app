@@ -26,12 +26,8 @@ pipeline {
 
             steps {
                 sh '''
-                    ls -la
-                    node --version
-                    npm --version
                     npm ci
                     npm run build
-                    ls -la
                 '''
             }
         }
@@ -95,9 +91,6 @@ pipeline {
             }
              steps {
                 sh '''
-                    node --version
-                    netlify --version
-                    netlify status
                     netlify deploy --dir=build --json > stagging-deploy-output.json
                     CI_ENVIRONMENT_URL=$(node-jq -r '.deploy_url'  stagging-deploy-output.json)
                     npx playwright test  --reporter=html
@@ -123,9 +116,6 @@ pipeline {
             }
              steps {
                 sh '''
-                    node --version
-                    netlify --version
-                    netlify status
                     netlify deploy --dir=build --prod --json > prod-deploy-output.json
                     CI_ENVIRONMENT_URL=$(node-jq -r '.url'  prod-deploy-output.json)
                     npx playwright test  --reporter=html

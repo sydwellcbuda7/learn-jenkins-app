@@ -85,7 +85,7 @@ pipeline {
              steps {
                 sh '''
                     netlify deploy --dir=build --json > stagging-deploy-output.json
-                    CI_ENVIRONMENT_URL=$(jp -r '.deploy_url'  stagging-deploy-output.json)
+                    CI_ENVIRONMENT_URL=$(jq -r '.deploy_url'  stagging-deploy-output.json)
                     npx playwright test  --reporter=html
                 '''
              }
@@ -110,7 +110,7 @@ pipeline {
              steps {
                 sh '''
                     netlify deploy --dir=build --prod --json > prod-deploy-output.json
-                    CI_ENVIRONMENT_URL=$(jp -r '.url'  prod-deploy-output.json)
+                    CI_ENVIRONMENT_URL=$(jq -r '.url'  prod-deploy-output.json)
                     npx playwright test  --reporter=html
                 '''
              }

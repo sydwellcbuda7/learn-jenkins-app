@@ -124,7 +124,6 @@ pipeline {
              steps {
                 sh '''
                     node --version
-                    npm install netlify-cli
                     netlify --version
                     netlify status
                     netlify deploy --dir=build --prod --json > prod-deploy-output.json

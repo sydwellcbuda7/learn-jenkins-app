@@ -96,7 +96,7 @@ pipeline {
              steps {
                 sh '''
                     node --version
-                    nnetlify --version
+                    netlify --version
                     netlify status
                     netlify deploy --dir=build --json > stagging-deploy-output.json
                     CI_ENVIRONMENT_URL=$(node-jq -r '.deploy_url'  stagging-deploy-output.json)
